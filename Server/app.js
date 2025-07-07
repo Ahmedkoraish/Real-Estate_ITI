@@ -1,14 +1,15 @@
-const express = require("express");
-const dotenv = require("dotenv");
-const morgan = require("morgan");
-const cors = require("cors");
-const mongoose = require("mongoose");
+import express from 'express'
+import dotenv from 'dotenv'
+import morgan from 'morgan'
+import cors from 'cors'
+import mongoose from 'mongoose'
 
-const userRouter = require("./routes/userRoutes");
-const listRouter = require("./routes/listRoutes");
+import userRouter from './src/routes/userRoutes.js'
+import listRouter from './src/routes/listRoutes.js'
 
 dotenv.config({ path: "config.env" });
 const app = express();
+const port  = process.env.PORT;
 
 // connect to database
 const DB_LOCAL = process.env.DB_LOCAL;
@@ -32,6 +33,8 @@ app.use("/api/v1/user", userRouter);
 app.use("/api/v1/list", listRouter);
 
 //server
-app.listen(8000, () => {
+app.listen(port, () => {
   console.log("listining to server...");
+}).on('error',(error)=>{
+  console.log("Error while starting server: ", error);
 });
