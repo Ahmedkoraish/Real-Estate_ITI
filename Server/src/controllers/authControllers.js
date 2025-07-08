@@ -28,8 +28,8 @@ export const signUp = async (req,res)=>{
 
         if(!userName || !email || !password || !gender || !phoneNumber){
             return res.status(400).json({
-                Status:"Failed",
-                Message:"please provide all required fileds"
+                status:"Failed",
+                message:"please provide all required fileds"
             })
         }
         const user = await userModel.create({
@@ -45,16 +45,16 @@ export const signUp = async (req,res)=>{
         const token = generateToken(user._id,user.userName);
 
         return res.status(201).json({
-            Status:"Success",
-            Message:"User Created Successfuly",
-            Data: user,
-            Token : token
+            status:"Success",
+            message:"User Created Successfuly",
+            data: user,
+            token : token
         })
     } catch (error) {
         return res.status(500).json({
-            Status:"Failed",
-            Messsage:"Internal Server Error",
-            Error: error.message
+            status:"Failed",
+            message:"Internal Server Error",
+            error: error.message
         })
     }
 }
@@ -64,15 +64,15 @@ export const login = async (req,res)=>{
         const {email,password} = req.body;
         if(!email || !password){
             return res.status(400).json({
-                Status:"Faild",
-                Message:"please provide email and password"
+                status:"Faild",
+                message:"please provide email and password"
             });
         }
         const user = await userModel.findOne({email});
         if(!user){
             return res.status(404).json({
-                Status:"failed",
-                Message:"User Must Register First"
+                status:"failed",
+                message:"User Must Register First"
             });
         }
 
@@ -80,22 +80,22 @@ export const login = async (req,res)=>{
 
         if(!ispasswordMatch){
             return res.status(401).json({
-                Status:"Failed",
-                Message:"Invalid Eamil Or Password"
+                status:"Failed",
+                message:"Invalid Eamil Or Password"
             });
         }
         const token = generateToken(user._id,user.userName);
 
         return res.status(200).json({
-            Status:"Success",
-            Message:"User Logged In Successfully",
-            Token:token
+            status:"Success",
+            message:"User Logged In Successfully",
+            token:token
         })
     } catch (error) {
         return res.status(500).json({
-            Status:"failed",
-            Message:"internal Server Error",
-            Error: error.message
+            status:"failed",
+            message:"internal Server Error",
+            error: error.message
         })
     }
 } 
@@ -108,8 +108,8 @@ export const isUserLoggedIn = async (req,res,next)=>{
         }
         if(!token){
             return res.status(401).json({
-                Status:"Failed",
-                Message:"you are not authorized to access this route,please login first"
+                status:"Failed",
+                message:"you are not authorized to access this route,please login first"
             })
         }
 
@@ -119,8 +119,8 @@ export const isUserLoggedIn = async (req,res,next)=>{
 
         if(!user){
             return es.status(404).json({
-                Status:"Failed",
-                Message:"User Not Found"
+                status:"Failed",
+                message:"User Not Found"
             })
         }
 
@@ -129,9 +129,9 @@ export const isUserLoggedIn = async (req,res,next)=>{
 
     } catch (error) {
         return res.status(500).json({
-            Status:"Failed",
-            Message:"internal Server Error",
-            Error: error.message
+            status:"Failed",
+            message:"internal Server Error",
+            error: error.message
         })
     }
 }
@@ -140,8 +140,8 @@ export const userPermission = (...roles)=>{
     return (req,res,next)=>{
         if(!roles.includes(req.user?.role)){
             return res.status(403).json({
-                Status:"Failed",
-                Message:"You do not have permission to access this route"
+                status:"Failed",
+                message:"You do not have permission to access this route"
             });
         }
         next();

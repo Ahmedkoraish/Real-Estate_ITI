@@ -11,15 +11,15 @@ export const getAllUsers = async (req,res)=>{
             })
         }
         res.status(201).json({
-            Status:"Success",
-            User_Length:users.length,
-            Data:users
+            status:"Success",
+            user_length:users.length,
+            data:users
         })
     } catch (error) {
         res.status(500).json({
-            Status:"Failed",
-            Message:"Internal server error",
-            Error:error.message
+            status:"Failed",
+            mesage:"Internal server error",
+            error:error.message
         })
     }
 }
@@ -32,15 +32,15 @@ export const updateUser =async (req,res)=>{
             runValidators: true
         });
         res.status(201).json({
-            Status:"Success",
-            Message:"User Udated",
-            Data:user,
+            status:"Success",
+            message:"User Udated",
+            data:user,
         })
     } catch (error) {
         res.status(500).json({
-            Status:"Failed",
-            Message:"Internal Server Error",
-            Error:error.message
+            status:"Failed",
+            message:"Internal Server Error",
+            error:error.message
         });
     }
 }
@@ -50,15 +50,15 @@ export const deleteUser = async (req,res)=>{
         const id = req.user._id;
         const user = await userModel.deleteOne({_id:id});
         res.status(201).json({
-            Status:"Success",
-            Message:"User Deleted ",
-            Data:user
+            status:"Success",
+            message:"User Deleted ",
+            data:user
         })
     } catch (error) {
         res.status(500).json({
-            Status:"Failed",
-            Message:"Internal Server Error",
-            Error:error.message
+            status:"Failed",
+            message:"Internal Server Error",
+            error:error.message
         })
     }
 }
@@ -67,14 +67,14 @@ export const deleteAllUsers = async (req,res)=>{
     try {
         const users = await userModel.deleteMany();
         res.status(201).json({
-            Status:"Success",
-            Message:"Users Deleted",
-            Data:users
+            status:"Success",
+            message:"Users Deleted",
+            data:users
         })
     } catch (error) {
         res.status(500).json({
-            Status:"Failed",
-            Message:"Internal Server Error"
+            status:"Failed",
+            message:"Internal Server Error"
         })
     }
 }

@@ -6,6 +6,7 @@ import mongoose from 'mongoose'
 
 import userRouter from './src/routes/userRoutes.js'
 import listRouter from './src/routes/listRoutes.js'
+import { isUserLoggedIn } from './src/controllers/authControllers.js'
 
 dotenv.config({ path: "config.env" });
 const app = express();
@@ -30,7 +31,7 @@ app.use(cors());
 
 //routes
 app.use("/api/v1/users", userRouter);
-app.use("/api/v1/list", listRouter);
+app.use("/api/v1/lists", listRouter);
 
 //server
 app.listen(port, () => {
