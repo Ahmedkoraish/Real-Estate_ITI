@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import becrypt from 'becryptjs';
+import becrypt from 'bcryptjs';
 const userSchema = new Schema({
     userName:{
         type: String,
@@ -13,7 +13,7 @@ const userSchema = new Schema({
         type: String,
         requierd:[true,'Email is required'],
         minLength:[3,'Email must be at Least 3 characters'],
-        maxLength:[20,'Email must be at Most 20 characters'],
+        maxLength:[50,'Email must be at Most 50 characters'],
         trim:true,
         unique:[true,"you are already registered "],
         lowercase:true,
@@ -38,12 +38,12 @@ const userSchema = new Schema({
     },
     gender:{
         type:String,
-        enum:{value:["male","female"],message:"Gender must be male Or female"},
+        enum:["male","female"],
         requierd:[true,'Gender Is required']
     },
     role:{
         type:String,
-        enum:{value:["user","admin"],message:'Role Must be user Or Admin'},
+        enum:["user","admin"],
         default:"user",
     },
     dateOfBirth:{
@@ -65,7 +65,7 @@ const userSchema = new Schema({
 {timestamps:true}
 );
 
-userSchema.pre('save',async(next)=>{
+userSchema.pre('save',async function (next){
     if(this.isModified('password')){
         this.password = await becrypt.hashSync(this.password, 10);
         next();

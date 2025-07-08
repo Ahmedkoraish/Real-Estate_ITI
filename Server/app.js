@@ -29,7 +29,7 @@ app.use(morgan("dev"));
 app.use(cors());
 
 //routes
-app.use("/api/v1/user", userRouter);
+app.use("/api/v1/users", userRouter);
 app.use("/api/v1/list", listRouter);
 
 //server
