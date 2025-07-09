@@ -29,12 +29,12 @@ const userSchema = new Schema({
         requierd:[true,"Password is required"],
         minLength:[8,'password must at Least 8 characters and you Put {VALUE} characters'],
         maxLength:[100,'[password must be at Most 100 Characters and you Put {VALUE} characters'],
-        validate:{
-            validator: (value)=>{
-                return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[a-zA-Z\d@$!%*?&]{8,100}$/.test(value);
-            },
-            message:"password Must Contain At Least One Uppercase Letter, One Lowercase Letter, and One Number"
-        }
+        // validate:{
+        //     validator: (value)=>{
+        //         return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[a-zA-Z\d@$!%*?&]{8,100}$/.test(value);
+        //     },
+        //     message:"password Must Contain At Least One Uppercase Letter, One Lowercase Letter, and One Number"
+        // }
     },
     gender:{
         type:String,
@@ -53,25 +53,17 @@ const userSchema = new Schema({
         type:String,
         requierd:[true,'Phone Number is required'],
         unique:[true,'phone Number must be Unique'],
-        validate:{
-            validator: (value)=>{
-                return /^01[0-2,5]\d{8}$/.test(value);
-            },
-            message:"Please enter a Valid Phone Number"
-        }
+        // validate:{
+        //     validator: (value)=>{
+        //         return /^01[0-2,5]\d{8}$/.test(value);
+        //     },
+        //     message:"Please enter a Valid Phone Number"
+        // }
     },
 
 },
 {timestamps:true}
 );
-
-userSchema.pre('save',async function (next){
-    if(this.isModified('password')){
-        this.password = await becrypt.hashSync(this.password, 10);
-        next();
-    }else
-        return next();
-})
 
 const userModel = mongoose.model('User',userSchema);
 export default userModel;

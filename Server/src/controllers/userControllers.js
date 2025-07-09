@@ -1,7 +1,7 @@
 import userModel from "../models/userModel.js"
 export const getAllUsers = async (req,res)=>{  
     try {
-        const users = await userModel.find({});
+        const users = await userModel.find({},{password:0,phoneNumber:0,__v:0});
 
         if(users.length===0){
             return res.status(404).json({
@@ -33,8 +33,7 @@ export const updateUser =async (req,res)=>{
         });
         res.status(201).json({
             status:"Success",
-            message:"User Udated",
-            data:user,
+            message:"User Updated",
         })
     } catch (error) {
         res.status(500).json({

@@ -1,6 +1,7 @@
 import userModel from "../models/userModel.js";
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs';
+import Crypto from 'crypto-js';
 
 const generateToken = (id,userName)=>{
     return jwt.sign(
@@ -32,14 +33,23 @@ export const signUp = async (req,res)=>{
                 message:"please provide all required fileds"
             })
         }
+        const isUserExist = await userModel.findOne({email:email});
+        if(isUserExist){
+            res.status(409).json({
+                status:"Failed",
+                message:"User Already Exsits"
+            })
+        }
+        const hashedPassword = bcrypt.hashSync(password,10);
+        const encryptPhoneNumber = Crypto.AES.encrypt(phoneNumber,process.env.USER_PASSWORD_KEY).toString();
         const user = await userModel.create({
             userName,
             email,
-            password,
+            password:hashedPassword,
             gender,
             role,
             dateOfBirth,
-            phoneNumber
+            phoneNumber:encryptPhoneNumber
         });
 
         const token = generateToken(user._id,user.userName);
@@ -47,7 +57,6 @@ export const signUp = async (req,res)=>{
         return res.status(201).json({
             status:"Success",
             message:"User Created Successfuly",
-            data: user,
             token : token
         })
     } catch (error) {
@@ -78,6 +87,8 @@ export const login = async (req,res)=>{
 
         const ispasswordMatch = isCorrectPassword(password,user.password);
 
+        const decryptPhoneNumber = Crypto.AES.decrypt(user.phoneNumber,process.env.USER_PASSWORD_KEY).toString(Crypto.enc.Utf8)
+        user.phoneNumber= decryptPhoneNumber;
         if(!ispasswordMatch){
             return res.status(401).json({
                 status:"Failed",
