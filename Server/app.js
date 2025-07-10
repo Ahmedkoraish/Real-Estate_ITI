@@ -29,8 +29,8 @@ app.use(morgan("dev"));
 app.use(cors());
 
 //routes
-app.use("/api/v1/user", userRouter);
-app.use("/api/v1/list", listRouter);
+app.use("/api/v1/users", userRouter);
+app.use("/api/v1/lists", listRouter);
 
 //server
 app.listen(port, () => {

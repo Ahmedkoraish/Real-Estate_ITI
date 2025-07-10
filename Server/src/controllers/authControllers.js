@@ -1,5 +1,7 @@
 import userModel from "../models/userModel.js";
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcryptjs';
+import Crypto from 'crypto-js';
 
 const generateToken = (id,userName)=>{
     return jwt.sign(
@@ -8,6 +10,11 @@ const generateToken = (id,userName)=>{
         {expiresIn: "1d"}
     );
 }
+
+const isCorrectPassword =async (currentPassword,userPassword)=>{
+    return await bcrypt.compare(currentPassword,userPassword)
+}
+
 export const signUp = async (req,res)=>{
     try {
         const {
@@ -20,20 +27,29 @@ export const signUp = async (req,res)=>{
             phoneNumber
         }= req.body;
 
-        if(!userName || !email || !password || !gender || phoneNumber){
+        if(!userName || !email || !password || !gender || !phoneNumber){
             return res.status(400).json({
-                status:"failed",
+                status:"Failed",
                 message:"please provide all required fileds"
             })
         }
+        const isUserExist = await userModel.findOne({email:email});
+        if(isUserExist){
+            res.status(409).json({
+                status:"Failed",
+                message:"User Already Exsits"
+            })
+        }
+        const hashedPassword = bcrypt.hashSync(password,10);
+        const encryptPhoneNumber = Crypto.AES.encrypt(phoneNumber,process.env.USER_PASSWORD_KEY).toString();
         const user = await userModel.create({
             userName,
             email,
-            password,
+            password:hashedPassword,
             gender,
             role,
             dateOfBirth,
-            phoneNumber
+            phoneNumber:encryptPhoneNumber
         });
 
         const token = generateToken(user._id,user.userName);
@@ -41,12 +57,11 @@ export const signUp = async (req,res)=>{
         return res.status(201).json({
             status:"Success",
             message:"User Created Successfuly",
-            data: user,
             token : token
         })
     } catch (error) {
         return res.status(500).json({
-            status:"failed",
+            status:"Failed",
             message:"Internal Server Error",
             error: error.message
         })
@@ -58,7 +73,7 @@ export const login = async (req,res)=>{
         const {email,password} = req.body;
         if(!email || !password){
             return res.status(400).json({
-                status:"failed",
+                status:"Faild",
                 message:"please provide email and password"
             });
         }
@@ -70,11 +85,13 @@ export const login = async (req,res)=>{
             });
         }
 
-        const ispasswordMatch = await user?.isCorrectPassword(password,user.password);
+        const ispasswordMatch = isCorrectPassword(password,user.password);
 
+        const decryptPhoneNumber = Crypto.AES.decrypt(user.phoneNumber,process.env.USER_PASSWORD_KEY).toString(Crypto.enc.Utf8)
+        user.phoneNumber= decryptPhoneNumber;
         if(!ispasswordMatch){
             return res.status(401).json({
-                status:"failed",
+                status:"Failed",
                 message:"Invalid Eamil Or Password"
             });
         }
@@ -98,23 +115,22 @@ export const isUserLoggedIn = async (req,res,next)=>{
     try {
         let token="";
         if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
-            token = req.headers.authorization.spalit(' ')[1];
+            token = req.headers.authorization.split(' ')[1];
         }
-
         if(!token){
             return res.status(401).json({
-                status:"failed",
+                status:"Failed",
                 message:"you are not authorized to access this route,please login first"
             })
         }
 
         const payLoad = jwt.verify(token,process.env.JWT_SECRET);
-        
+
         const user = await userModel.findById(payLoad.id);
 
         if(!user){
             return es.status(404).json({
-                status:"faild",
+                status:"Failed",
                 message:"User Not Found"
             })
         }
@@ -124,7 +140,7 @@ export const isUserLoggedIn = async (req,res,next)=>{
 
     } catch (error) {
         return res.status(500).json({
-            status:"failed",
+            status:"Failed",
             message:"internal Server Error",
             error: error.message
         })
@@ -133,10 +149,10 @@ export const isUserLoggedIn = async (req,res,next)=>{
 
 export const userPermission = (...roles)=>{
     return (req,res,next)=>{
-        if(!roles.includes(req.user.role)){
+        if(!roles.includes(req.user?.role)){
             return res.status(403).json({
-                status:"faild",
-                message:"you arn not have Permission to access this route"
+                status:"Failed",
+                message:"You do not have permission to access this route"
             });
         }
         next();
