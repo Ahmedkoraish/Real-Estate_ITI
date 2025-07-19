@@ -25,8 +25,6 @@ export const readLists = async (req,res)=> {
         const {sort,page,limit,field} = req?.query;
         const queryBody = {}
         
-        queryBody.host = req.user._id;
-
         let query = listModel.find(queryBody);
 
         if(sort){
@@ -57,16 +55,54 @@ export const readLists = async (req,res)=> {
     }
 }
 
+export const getListById =async (req,res)=>{
+    try {
+        const {id} = req.params;
+        const list = await  listModel.findOne({_id:id});
+        if(!list){
+            return res.status(404).json({
+            status:"Failed",
+            message:"List Not Found"
+        })
+        }
+        return res.status(201).json({
+            status:"Success",
+            data: list
+        })
+    } catch (error) {
+        return res.status(500).json({
+            status:"Failed",
+            message:"Internal Server Error",
+            error:error.message
+        })
+    }
+}
+
 export const updateList = async (req,res)=> {
     try {
         const {id} = req.params;
-        const list = await listModel.findByIdAndUpdate(id,req.body,{
+        const host = req.user._id;
+
+        const list = await listModel.findOne({_id:id});
+        if(!list){
+            return res.status(404).json({
+            status:"Failed",
+            message:"List Not Found"
+        })
+        }
+        if(list.host.toString()!==host.toString()){
+            return res.status(403).json({
+            status:"Failed",
+            message:"Can not to Update this List"
+        })
+        }
+        const newList = await listModel.findByIdAndUpdate(id,req.body,{
             new:true,
             runValidators:true
         });
-        res.status(201).json({
+        res.status(200).json({
             status:"Success",
-            data: list
+            data: newList
         })
     } catch (error) {
         res.status(500).json({
@@ -80,14 +116,29 @@ export const updateList = async (req,res)=> {
 export const deleteList = async (req,res)=> {
     try {
         const {id} = req.params;
-        const list  = await listModel.deleteOne({_id:id});
-        res.status(201).json({
+        const host = req.user._id;
+
+        const list = await listModel.findOne({_id:id});
+        if(!list){
+            return res.status(404).json({
+            status:"Failed",
+            message:"List Not Found"
+        })
+        }
+        if(list.host.toString()!==host.toString()){
+            return res.status(403).json({
+            status:"Failed",
+            message:"Can not to Delete This List",
+        })
+        }
+        const resData  = await listModel.deleteOne({_id:id});
+        return res.status(200).json({
             status:"Success",
             message:"List Deleted",
-            data:list
+            data:resData
         })
     } catch (error) {
-        res.status(500).json({
+        return res.status(500).json({
             status:"Failed",
             message:"Internal Server Error",
             error:error.message
@@ -97,7 +148,7 @@ export const deleteList = async (req,res)=> {
 
 export const searchLists = async (req,res)=>{
     try {
-        const {title,description} = req?.query;
+        const {title,description,price,date,location,amenities} = req?.query;
         const query = {};
         if(title?.trim()){
             query.title = {$regex: new RegExp(title,"i")}
@@ -105,7 +156,26 @@ export const searchLists = async (req,res)=>{
         if(description?.trim()){
             query.descrption = {$regex: new RegExp(description,"i")}
         }
-        query.host = req.user._id;
+        if(price?.trim()){
+            query.pricePerNight = {$lte:price};
+        }
+        if(date?.trim()){
+            const currDate = new Date(date);
+            const nextDate = new Date(currDate);
+            nextDate.setDate(nextDate.getDate() + 1);
+
+            query.createdAt = {
+            $gte: currDate,
+            $lt: nextDate
+            };
+        }
+        if(location?.trim()){
+            query.location = {$regex: new RegExp(location,"i")}
+        }
+        if(amenities?.trim()){
+            query.amenities = {$regex: new RegExp(amenities,"i")}
+        }
+        // query.host = req.user._id;
         const lists = await listModel.find(query);
         
         res.status(200).json({

@@ -29,12 +29,12 @@ const userSchema = new Schema({
         requierd:[true,"Password is required"],
         minLength:[8,'password must at Least 8 characters and you Put {VALUE} characters'],
         maxLength:[100,'[password must be at Most 100 Characters and you Put {VALUE} characters'],
-        // validate:{
-        //     validator: (value)=>{
-        //         return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[a-zA-Z\d@$!%*?&]{8,100}$/.test(value);
-        //     },
-        //     message:"password Must Contain At Least One Uppercase Letter, One Lowercase Letter, and One Number"
-        // }
+        validate:{
+            validator: (value)=>{
+                return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[a-zA-Z\d@$!%*?&]{8,100}$/.test(value);
+            },
+            message:"password Must Contain At Least One Uppercase Letter, One Lowercase Letter, and One Number"
+        }
     },
     gender:{
         type:String,
@@ -43,8 +43,8 @@ const userSchema = new Schema({
     },
     role:{
         type:String,
-        enum:["user","admin"],
-        default:"user",
+        enum:["host","admin","guest"],
+        default:"guest",
     },
     dateOfBirth:{
         type:Date,
