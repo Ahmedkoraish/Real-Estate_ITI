@@ -124,7 +124,6 @@ export const isUserLoggedIn = async (req,res,next)=>{
         }
 
         const payLoad = jwt.verify(token,process.env.JWT_SECRET);
-
         const user = await userModel.findById(payLoad.id);
 
         if(!user){
@@ -133,6 +132,7 @@ export const isUserLoggedIn = async (req,res,next)=>{
                 message:"User Not Found"
             })
         }
+
 
         req.user = user;
         next();

@@ -1,6 +1,6 @@
 import express from 'express'
 import { isUserLoggedIn,userPermission } from '../controllers/authControllers.js';
-import { createList, deleteList, readLists, searchLists, updateList } from '../controllers/listControllers.js';
+import { createList, deleteList, getListById, readLists, searchLists, updateList } from '../controllers/listControllers.js';
 
 const router = express.Router();
 
@@ -9,14 +9,15 @@ router
 
 router
     .route('/')
-    .post(userPermission('admin','user'),createList)
-    .get(userPermission('admin','user'),readLists)
+    .post(userPermission('host'),createList)
+    .get(userPermission('admin','host','guset'),readLists)
 
 
 router
     .route('/:id')
-    .patch(userPermission('admin','user'),updateList)
-    .delete(userPermission('admin','user'),deleteList)
+    .get(getListById)
+    .patch(userPermission('admin','host'),updateList)
+    .delete(userPermission('admin','host'),deleteList)
 
 router
     .route('/search')
