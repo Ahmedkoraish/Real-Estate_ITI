@@ -55,6 +55,29 @@ export const readLists = async (req,res)=> {
     }
 }
 
+export const getListById =async (req,res)=>{
+    try {
+        const {id} = req.params;
+        const list = await  listModel.findOne({_id:id});
+        if(!list){
+            return res.status(404).json({
+            status:"Failed",
+            message:"List Not Found"
+        })
+        }
+        return res.status(201).json({
+            status:"Success",
+            data: list
+        })
+    } catch (error) {
+        return res.status(500).json({
+            status:"Failed",
+            message:"Internal Server Error",
+            error:error.message
+        })
+    }
+}
+
 export const updateList = async (req,res)=> {
     try {
         const {id} = req.params;
@@ -77,7 +100,7 @@ export const updateList = async (req,res)=> {
             new:true,
             runValidators:true
         });
-        res.status(201).json({
+        res.status(200).json({
             status:"Success",
             data: newList
         })

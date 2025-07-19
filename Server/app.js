@@ -6,6 +6,7 @@ import mongoose from 'mongoose'
 
 import userRouter from './src/routes/userRoutes.js'
 import listRouter from './src/routes/listRoutes.js'
+import bookingRouter from './src/routes/bookingRoutes.js'
 
 dotenv.config({ path: "config.env" });
 const app = express();
@@ -31,6 +32,7 @@ app.use(cors());
 //routes
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/lists", listRouter);
+app.use('/api/v1/bookings',bookingRouter)
 
 //server
 app.listen(port, () => {

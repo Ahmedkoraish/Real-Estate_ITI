@@ -1,6 +1,6 @@
 import express from 'express'
 import { isUserLoggedIn,userPermission } from '../controllers/authControllers.js';
-import { createList, deleteList, readLists, searchLists, updateList } from '../controllers/listControllers.js';
+import { createList, deleteList, getListById, readLists, searchLists, updateList } from '../controllers/listControllers.js';
 
 const router = express.Router();
 
@@ -15,6 +15,7 @@ router
 
 router
     .route('/:id')
+    .get(getListById)
     .patch(userPermission('admin','host'),updateList)
     .delete(userPermission('admin','host'),deleteList)
 
