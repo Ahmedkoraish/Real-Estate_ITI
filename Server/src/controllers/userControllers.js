@@ -1,7 +1,7 @@
 import userModel from "../models/userModel.js"
 export const getAllUsers = async (req,res)=>{  
     try {
-        const users = await userModel.find({},{password:0,phoneNumber:0,__v:0});
+        const users = await userModel.find({},{password:0,phoneNumber:0,role:0,__v:0});
 
         if(users.length===0){
             return res.status(404).json({
@@ -64,7 +64,7 @@ export const deleteUser = async (req,res)=>{
 
 export const deleteAllUsers = async (req,res)=>{
     try {
-        const users = await userModel.deleteMany();
+        const users = await userModel.deleteMany({role:{$ne:'admin'}});
         res.status(201).json({
             status:"Success",
             message:"Users Deleted",

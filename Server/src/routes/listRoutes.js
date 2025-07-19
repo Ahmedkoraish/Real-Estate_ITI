@@ -9,14 +9,14 @@ router
 
 router
     .route('/')
-    .post(userPermission('admin','user'),createList)
-    .get(userPermission('admin','user'),readLists)
+    .post(userPermission('host'),createList)
+    .get(userPermission('admin','host','guset'),readLists)
 
 
 router
     .route('/:id')
-    .patch(userPermission('admin','user'),updateList)
-    .delete(userPermission('admin','user'),deleteList)
+    .patch(userPermission('admin','host'),updateList)
+    .delete(userPermission('admin','host'),deleteList)
 
 router
     .route('/search')
