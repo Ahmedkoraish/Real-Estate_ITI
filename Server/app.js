@@ -7,6 +7,7 @@ import mongoose from 'mongoose'
 import userRouter from './src/routes/userRoutes.js'
 import listRouter from './src/routes/listRoutes.js'
 import bookingRouter from './src/routes/bookingRoutes.js'
+import { swaggerDocs } from './src/utilities/swagerDoc.js'
 
 dotenv.config({ path: "config.env" });
 const app = express();
@@ -23,6 +24,9 @@ mongoose
     console.log(err);
     console.log("Error while connected to DB");
   });
+
+// Swager Docmintation
+swaggerDocs(app);
 
 //general middlewares
 app.use(express.json());
