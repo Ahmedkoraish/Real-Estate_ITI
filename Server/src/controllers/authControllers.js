@@ -2,6 +2,7 @@ import userModel from "../models/userModel.js";
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs';
 import Crypto from 'crypto-js';
+import { sendOTPEmail } from "../utilities/sendEmail.utilies.js";
 
 const generateToken = (id,userName)=>{
     return jwt.sign(
@@ -21,16 +22,23 @@ export const signUp = async (req,res)=>{
             userName,
             email,
             password,
+            confirmPassword,
             gender,
             role,
             dateOfBirth,
             phoneNumber
         }= req.body;
 
-        if(!userName || !email || !password || !gender || !phoneNumber){
+        if(!userName || !email || !password || !confirmPassword || !gender || !phoneNumber){
             return res.status(400).json({
                 status:"Failed",
                 message:"Please provide all required fields"
+            })
+        }
+        if(password!==confirmPassword){
+            return res.status(400).json({
+                status:"Failed",
+                message:"Password Don't Match"
             })
         }
         const isUserExist = await userModel.findOne({email:email});
@@ -40,6 +48,8 @@ export const signUp = async (req,res)=>{
                 message:"User Already Exists"
             })
         }
+        const otp =  Math.floor(10000 + Math.random()*900000).toString();
+        const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000)
         const encryptPhoneNumber = Crypto.AES.encrypt(phoneNumber,process.env.USER_PASSWORD_KEY).toString();
         const user = await userModel.create({
             userName,
@@ -48,15 +58,16 @@ export const signUp = async (req,res)=>{
             gender,
             role,
             dateOfBirth,
-            phoneNumber:encryptPhoneNumber
+            phoneNumber:encryptPhoneNumber,
+            otp,
+            otpExpiresAt
         });
 
-        const token = generateToken(user._id,user.userName);
+        await sendOTPEmail(user.email,otp);
 
         return res.status(201).json({
             status:"Success",
             message:"User Created Successfuly",
-            token : token
         })
     } catch (error) {
         return res.status(500).json({
@@ -84,16 +95,24 @@ export const login = async (req,res)=>{
             });
         }
 
-        const ispasswordMatch = isCorrectPassword(password,user.password);
-
-        const decryptPhoneNumber = Crypto.AES.decrypt(user.phoneNumber,process.env.USER_PASSWORD_KEY).toString(Crypto.enc.Utf8)
-        user.phoneNumber= decryptPhoneNumber;
+        const ispasswordMatch =await isCorrectPassword(password,user.password);
+        
         if(!ispasswordMatch){
             return res.status(401).json({
                 status:"Failed",
                 message:"Invalid Eamil Or Password"
             });
         }
+        
+        const decryptPhoneNumber = Crypto.AES.decrypt(user.phoneNumber,process.env.USER_PASSWORD_KEY).toString(Crypto.enc.Utf8)
+        user.phoneNumber= decryptPhoneNumber;
+
+        if (!user.isVerified) {
+            return res.status(403).json({
+                status:"Failed",
+                message: 'Please verify your email via OTP first' 
+                });
+            }
         const token = generateToken(user._id,user.userName);
 
         return res.status(200).json({

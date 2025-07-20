@@ -5,23 +5,28 @@ import { createList, deleteList, getListById, readLists, searchLists, updateList
 const router = express.Router();
 
 router
+    .route('/')
+    .get(readLists)
+
+router
+    .route('/search')
+    .get(searchLists)
+    
+router
+    .route('/:id')
+    .get(getListById)
+
+router
     .use(isUserLoggedIn)
 
 router
     .route('/')
     .post(userPermission('host'),createList)
-    .get(userPermission('admin','host','guset'),readLists)
-
 
 router
     .route('/:id')
-    .get(getListById)
     .patch(userPermission('admin','host'),updateList)
     .delete(userPermission('admin','host'),deleteList)
-
-router
-    .route('/search')
-    .get(searchLists)
 
 export default router;
 
