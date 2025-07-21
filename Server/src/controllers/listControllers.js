@@ -175,7 +175,6 @@ export const searchLists = async (req,res)=>{
         if(amenities?.trim()){
             query.amenities = {$regex: new RegExp(amenities,"i")}
         }
-        // query.host = req.user._id;
         const lists = await listModel.find(query);
         
         res.status(200).json({

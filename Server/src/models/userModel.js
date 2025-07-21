@@ -29,12 +29,12 @@ const userSchema = new Schema({
         requierd:[true,"Password is required"],
         minLength:[8,'password must at Least 8 characters and you Put {VALUE} characters'],
         maxLength:[100,'[password must be at Most 100 Characters and you Put {VALUE} characters'],
-        validate:{
-            validator: (value)=>{
-                return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[a-zA-Z\d@$!%*?&]{8,100}$/.test(value);
-            },
-            message:"password Must Contain At Least One Uppercase Letter, One Lowercase Letter, and One Number"
-        }
+        // validate:{
+        //     validator: (value)=>{
+        //         return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[a-zA-Z\d@$!%*?&]{8,100}$/.test(value);
+        //     },
+        //     message:"password Must Contain At Least One Uppercase Letter, One Lowercase Letter, and One Number"
+        // }
     },
     gender:{
         type:String,
@@ -46,6 +46,10 @@ const userSchema = new Schema({
         enum:["host","admin","guest"],
         default:"guest",
     },
+    isVerified:{
+        type:Boolean,
+        default:false
+    },
     dateOfBirth:{
         type:Date,
     },
@@ -53,6 +57,7 @@ const userSchema = new Schema({
         type:String,
         requierd:[true,'Phone Number is required'],
         unique:[true,'phone Number must be Unique'],
+        //Egyption Phone Number
         // validate:{
         //     validator: (value)=>{
         //         return /^01[0-2,5]\d{8}$/.test(value);
@@ -60,7 +65,10 @@ const userSchema = new Schema({
         //     message:"Please enter a Valid Phone Number"
         // }
     },
-
+    otp:String,
+    otpExpiresAt:Date,
+    resetPasswordOTP:String,
+    resetPasswordOTPExpires:Date
 },
 {timestamps:true}
 );
