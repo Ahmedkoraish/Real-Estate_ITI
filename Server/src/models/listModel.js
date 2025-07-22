@@ -20,6 +20,16 @@ const listSchema = new Schema({
         required:[true,'Price Per Night is Required'],
         min:[0,'preice Per Night must be grater than Or equal to 0']
     },
+    category:{
+        type:String,
+        enum:['apartment', 'villa', 'studio', 'duplex'],
+        required:[true,"Category Is Required"]
+    },
+    locationType:{
+        type:String,
+        enum:['seaside', 'city', 'mountain', 'rural'],
+        default:'city'
+    },
     location:{
         type:String,
         required:[true,'Location is Required']

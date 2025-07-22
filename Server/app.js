@@ -1,21 +1,24 @@
-import express from 'express'
-import dotenv from 'dotenv'
-import morgan from 'morgan'
-import cors from 'cors'
-import mongoose from 'mongoose'
+import express from "express";
+import dotenv from "dotenv";
+import morgan from "morgan";
+import cors from "cors";
+import mongoose from "mongoose";
 
-import userRouter from './src/routes/userRoutes.js'
-import listRouter from './src/routes/listRoutes.js'
-import bookingRouter from './src/routes/bookingRoutes.js'
-import { swaggerDocs } from './src/utilities/swagerDoc.js'
+import userRouter from "./src/routes/userRoutes.js";
+import listRouter from "./src/routes/listRoutes.js";
+import bookingRouter from "./src/routes/bookingRoutes.js";
+import { swaggerDocs } from "./src/utilities/swagerDoc.js";
 
 dotenv.config({ path: "config.env" });
 const app = express();
-const port  = process.env.PORT;
+const port = process.env.PORT;
 
 // connect to database
 const DB_LOCAL = process.env.DB_LOCAL;
+const DB = process.env.DB;
+console.log(DB);
 mongoose
+  // .connect(DB)
   .connect(DB_LOCAL)
   .then(() => {
     console.log("DB Connected Successfully");
@@ -36,11 +39,13 @@ app.use(cors());
 //routes
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/lists", listRouter);
-app.use('/api/v1/bookings',bookingRouter)
+app.use("/api/v1/bookings", bookingRouter);
 
 //server
-app.listen(port, () => {
-  console.log("listining to server...");
-}).on('error',(error)=>{
-  console.log("Error while starting server: ", error);
-});
+app
+  .listen(port, () => {
+    console.log("listining to server...");
+  })
+  .on("error", (error) => {
+    console.log("Error while starting server: ", error);
+  });

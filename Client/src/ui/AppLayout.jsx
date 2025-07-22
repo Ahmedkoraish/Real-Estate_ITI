@@ -1,11 +1,14 @@
-import React from "react";
 import { Outlet } from "react-router-dom";
-
+import Header from "./Header";
+import Footer from "./Footer";
 export default function AppLayout() {
   return (
-    <div>
-      <h1>AppLayout</h1>
-      <Outlet />
+    <div className="min-h-screen grid grid-rows-[auto_1fr_auto] max-w-[1600px] ">
+      <Header />
+      <main className="mx-4 md:mx-24">
+        <Outlet />
+      </main>
+      <Footer />
     </div>
   );
 }

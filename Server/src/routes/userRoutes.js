@@ -1,5 +1,5 @@
 import express from 'express';
-import { deleteAllUsers, deleteUser, getAllUsers, updateUser } from '../controllers/userControllers.js';
+import { deleteAllUsers, deleteUser, getAllUsers, requestPasswordReset, resendOTP, resetPassword, updateUser, verifyOTP } from '../controllers/userControllers.js';
 import { isUserLoggedIn, login, signUp, userPermission } from '../controllers/authControllers.js';
 
 const router = express.Router();
@@ -11,6 +11,22 @@ router
 router
     .route('/signup')
     .post(signUp)
+
+router
+    .route('/verify-otp')
+    .post(verifyOTP)
+
+router
+    .route('/request-password-reset')
+    .post(requestPasswordReset);
+
+router
+    .route('/reset-password')
+    .post(resetPassword);
+
+router
+    .route('/resend-otp')
+    .post(resendOTP);
 
 router
     .route('/all')

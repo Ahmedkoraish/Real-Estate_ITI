@@ -142,6 +142,108 @@ const swaggerDefinition = {
             },
         },
         },
+        '/users/verify-otp': {
+            post: {
+                summary: 'Verify OTP for email verification',
+                tags: ['Users'],
+                requestBody: {
+                required: true,
+                content: {
+                    'application/json': {
+                    schema: {
+                        type: 'object',
+                        required: ['email', 'otp'],
+                        properties: {
+                        email: { type: 'string' },
+                        otp: { type: 'string' },
+                        },
+                    },
+                    },
+                },
+                },
+                responses: {
+                200: { description: 'Email verified successfully' },
+                400: { description: 'Invalid or expired OTP' },
+                },
+            },
+            },
+
+            '/users/resend-otp': {
+            post: {
+                summary: 'Resend OTP to the user\'s email',
+                tags: ['Users'],
+                requestBody: {
+                required: true,
+                content: {
+                    'application/json': {
+                    schema: {
+                        type: 'object',
+                        required: ['email'],
+                        properties: {
+                        email: { type: 'string' },
+                        },
+                    },
+                    },
+                },
+                },
+                responses: {
+                200: { description: 'OTP resent to email' },
+                404: { description: 'User not found' },
+                },
+            },
+            },
+
+            '/users/request-password-reset': {
+            post: {
+                summary: 'Request password reset OTP',
+                tags: ['Users'],
+                requestBody: {
+                required: true,
+                content: {
+                    'application/json': {
+                    schema: {
+                        type: 'object',
+                        required: ['email'],
+                        properties: {
+                        email: { type: 'string' },
+                        },
+                    },
+                    },
+                },
+                },
+                responses: {
+                200: { description: 'OTP sent to email for password reset' },
+                404: { description: 'User not found' },
+                },
+            },
+            },
+
+            '/users/reset-password': {
+            post: {
+                summary: 'Reset password using OTP',
+                tags: ['Users'],
+                requestBody: {
+                required: true,
+                content: {
+                    'application/json': {
+                    schema: {
+                        type: 'object',
+                        required: ['email', 'otp', 'newPassword'],
+                        properties: {
+                        email: { type: 'string' },
+                        otp: { type: 'string' },
+                        newPassword: { type: 'string', format: 'password' },
+                        },
+                    },
+                    },
+                },
+                },
+                responses: {
+                200: { description: 'Password reset successful' },
+                400: { description: 'Invalid or expired OTP' },
+                },
+            },
+            },
         '/lists': {
             post: {
                 summary: 'Create a new listing (host only)',
