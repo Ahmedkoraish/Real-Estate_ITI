@@ -28,8 +28,9 @@ export const signUp = async (req,res)=>{
             dateOfBirth,
             phoneNumber
         }= req.body;
+        
 
-        if(!userName || !email || !password || !confirmPassword || !gender || !phoneNumber){
+        if(!userName || !email || !password || !confirmPassword){
             return res.status(400).json({
                 status:"Failed",
                 message:"Please provide all required fields"
@@ -41,6 +42,7 @@ export const signUp = async (req,res)=>{
                 message:"Password Don't Match"
             })
         }
+
         const isUserExist = await userModel.findOne({email:email});
         if(isUserExist){
             return res.status(409).json({
@@ -48,9 +50,10 @@ export const signUp = async (req,res)=>{
                 message:"User Already Exists"
             })
         }
+
         const otp =  Math.floor(10000 + Math.random()*900000).toString();
         const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000)
-        const encryptPhoneNumber = Crypto.AES.encrypt(phoneNumber,process.env.USER_PASSWORD_KEY).toString();
+                
         const user = await userModel.create({
             userName,
             email,
@@ -58,7 +61,7 @@ export const signUp = async (req,res)=>{
             gender,
             role,
             dateOfBirth,
-            phoneNumber:encryptPhoneNumber,
+            phoneNumber,
             otp,
             otpExpiresAt
         });
@@ -73,7 +76,7 @@ export const signUp = async (req,res)=>{
         return res.status(500).json({
             status:"Failed",
             message:"Internal Server Error",
-            error: error.message
+            error: error.message,
         })
     }
 }
@@ -96,16 +99,24 @@ export const login = async (req,res)=>{
         }
 
         const ispasswordMatch =await isCorrectPassword(password,user.password);
-        
+
         if(!ispasswordMatch){
             return res.status(401).json({
                 status:"Failed",
                 message:"Invalid Eamil Or Password"
             });
         }
-        
-        const decryptPhoneNumber = Crypto.AES.decrypt(user.phoneNumber,process.env.USER_PASSWORD_KEY).toString(Crypto.enc.Utf8)
-        user.phoneNumber= decryptPhoneNumber;
+
+        if(user.phoneNumber){
+            const decryptPhoneNumber = Crypto.AES.decrypt(
+                user.phoneNumber,
+                process.env.USER_PASSWORD_KEY
+            ).toString(Crypto.enc.Utf8);
+            console.log(decryptPhoneNumber);
+            
+            user.phoneNumber = decryptPhoneNumber;
+            await user.save();
+        }
 
         if (!user.isVerified) {
             return res.status(403).json({
@@ -114,7 +125,6 @@ export const login = async (req,res)=>{
                 });
             }
         const token = generateToken(user._id,user.userName);
-
         return res.status(200).json({
             status:"Success",
             message:"User Logged In Successfully",
