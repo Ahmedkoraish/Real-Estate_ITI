@@ -29,7 +29,7 @@ export const signUp = async (req,res)=>{
             phoneNumber
         }= req.body;
 
-        if(!userName || !email || !password || !confirmPassword || !gender || !phoneNumber){
+        if(!userName || !email || !password || !confirmPassword){
             return res.status(400).json({
                 status:"Failed",
                 message:"Please provide all required fields"
@@ -50,7 +50,11 @@ export const signUp = async (req,res)=>{
         }
         const otp =  Math.floor(10000 + Math.random()*900000).toString();
         const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000)
-        const encryptPhoneNumber = Crypto.AES.encrypt(phoneNumber,process.env.USER_PASSWORD_KEY).toString();
+        const encryptPhoneNumber=null;
+        if(phoneNumber){
+            encryptPhoneNumber = Crypto.AES.encrypt(phoneNumber,process.env.USER_PASSWORD_KEY).toString();
+        }
+        
         const user = await userModel.create({
             userName,
             email,

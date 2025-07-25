@@ -39,7 +39,7 @@ const userSchema = new Schema({
     gender:{
         type:String,
         enum:["male","female"],
-        requierd:[true,'Gender Is required']
+        // requierd:[true,'Gender Is required']
     },
     role:{
         type:String,
@@ -55,8 +55,8 @@ const userSchema = new Schema({
     },
     phoneNumber:{
         type:String,
-        requierd:[true,'Phone Number is required'],
-        unique:[true,'phone Number must be Unique'],
+        // requierd:[true,'Phone Number is required'],
+        unique:[true,'This Number Registerd Before'],
         //Egyption Phone Number
         // validate:{
         //     validator: (value)=>{
