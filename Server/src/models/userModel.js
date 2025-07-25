@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from 'bcryptjs';
+import Crypto from 'crypto-js'
 const userSchema = new Schema({
     userName:{
         type: String,
@@ -55,8 +56,9 @@ const userSchema = new Schema({
     },
     phoneNumber:{
         type:String,
+        sparse:true
         // requierd:[true,'Phone Number is required'],
-        unique:[true,'This Number Registerd Before'],
+        // unique:[true,'This Number Registerd Before'],
         //Egyption Phone Number
         // validate:{
         //     validator: (value)=>{
@@ -74,11 +76,18 @@ const userSchema = new Schema({
 );
 
 userSchema.pre('save',async function(next){
-    if(this.isModified('password')){
-        this.password = await bcrypt.hashSync(this.password,+process.env.HASHING_SALT);
-        next()
-    }else {
-        return next();
+    try {
+        if (this.isModified('password')) {
+            this.password = bcrypt.hashSync(this.password, +process.env.HASHING_SALT);
+        }
+
+        if (this.isModified('phoneNumber') && this.phoneNumber) {
+            this.phoneNumber = Crypto.AES.encrypt(this.phoneNumber, process.env.USER_PASSWORD_KEY).toString();
+        } 
+
+        next();
+    } catch (err) {
+        next(err);
     }
 })
 

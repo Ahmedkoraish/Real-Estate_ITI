@@ -1,6 +1,6 @@
 import userModel from "../models/userModel.js"
-import bcrypt from 'bcryptjs'
 import { sendOTPEmail } from "../utilities/sendEmail.utilies.js";
+import Crypto from 'crypto-js';
 export const getAllUsers = async (req,res)=>{  
     try {
         const users = await userModel.find({},{password:0,phoneNumber:0,role:0,__v:0});
