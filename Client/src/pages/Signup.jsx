@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import Header from "../ui/Header";
 
 export default function Signup() {
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false ); 
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const [errMessage, SetErrMessage] = useState("");
